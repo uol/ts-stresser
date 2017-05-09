@@ -29,7 +29,7 @@ var (
 )
 
 // SenderFactory creates sender objects
-type SenderFactory func(id int, servers []string, port uint16) Sender
+type SenderFactory func(id uint64, servers []string, port uint16) Sender
 
 // Sender defines the behaviour of how objects send data to OpenTSDB servers
 type Sender interface {
@@ -39,10 +39,10 @@ type Sender interface {
 var (
 	// Protocols are the functions that send data
 	Protocols = map[string]SenderFactory{
-		"http": func(id int, servers []string, port uint16) Sender {
+		"http": func(id uint64, servers []string, port uint16) Sender {
 			return &restSender{id: id, servers: servers, port: port}
 		},
-		"udp": func(id int, servers []string, port uint16) Sender {
+		"udp": func(id uint64, servers []string, port uint16) Sender {
 			return &udpSender{id: id, servers: servers, port: port}
 		},
 	}
@@ -142,8 +142,8 @@ func main() {
 	}
 
 	wg.Add(int(goroutines))
-	for i := 1; i <= int(goroutines); i++ {
-		go func(i int) {
+	for i := uint64(1); i <= goroutines; i++ {
+		go func(i uint64) {
 			Logger.WithFields(debugFields("main", "", "main")).Debugf("Starting goroutine: %d", i)
 			for {
 				RunTest(datasetSize, hostCount, serviceCount, keyspace, factory(i, servers, uint16(port)))

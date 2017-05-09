@@ -20,7 +20,7 @@ func chose(servers []string) string {
 
 // RestSender sends points using http protocol
 type restSender struct {
-	id      int
+	id      uint64
 	servers []string
 	port    uint16
 }
@@ -67,7 +67,7 @@ func (sender *restSender) Send(data DataList) error {
 
 // UDPSender sends points using UDP protocol
 type udpSender struct {
-	id      int
+	id      uint64
 	servers []string
 	port    uint16
 }

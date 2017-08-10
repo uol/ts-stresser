@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -58,7 +59,7 @@ func init() {
 		Level:     logrus.InfoLevel,
 	}
 
-	nonce = uuid.New()
+	nonce = strings.Replace(uuid.New(), "-", "", -1)
 }
 
 // RunTest actually runs the test
@@ -66,7 +67,7 @@ func RunTest(datasetSize, hostCount, serviceCount uint64, keyspace string, sende
 	var host, service, start, delta uint64
 	data := make(DataList, datasetSize)
 	for index := range data {
-		data[index].Metric = fmt.Sprintf("testing.metric.run-%s.index-%d", nonce, index)
+		data[index].Metric = fmt.Sprintf("%s%d", nonce, index)
 	}
 	start = uint64(rand.Int63n(int64(hostCount)))
 	for delta = 0; delta <= hostCount; delta++ {
@@ -74,8 +75,8 @@ func RunTest(datasetSize, hostCount, serviceCount uint64, keyspace string, sende
 		for service = 1; service <= serviceCount; service++ {
 			for index := range data {
 				data[index].ChangeDefaultTags(
-					fmt.Sprintf("host-%s-%d", nonce, host),
-					fmt.Sprintf("service-%s-%d", nonce, service),
+					fmt.Sprintf("%s%d", nonce, host),
+					fmt.Sprintf("%s%d", nonce, service),
 					keyspace,
 				)
 				data[index].Randomize()
